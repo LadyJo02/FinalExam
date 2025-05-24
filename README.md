@@ -1,8 +1,8 @@
 # Cloud Computing - Final Exam
 
 **Members**:
-- Jasmine Canaman - *Staging Area (CRM)*
-- Honey Pabololot - *Staging Area (ERP)*
+- Honey Pabololot - *Staging Area (CRM)*
+- Rachel Jasmine Canaman - *Staging Area (ERP)*
 - Ian Macalisang - *Data Warehouse*
 - Joanna Santos - *Streamlit Dashboard*
 
