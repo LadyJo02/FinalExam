@@ -1,10 +1,10 @@
 # Cloud Computing - Final Exam
 
 Members:
-Jasmine Rachel Canaman - Staging Area (CRM)
-Honey Angel Pabololot - Staging Area (ERP)
-Ian Jure Macalisang - Data Warehouse
-Joanna Reyda Santos - Streamlit Dashboard
+- Jasmine Canaman - Staging Area (CRM)
+- Honey Pabololot - Staging Area (ERP)
+- Ian Macalisang - Data Warehouse
+- Joanna Santos - Streamlit Dashboard
 
 
 Note: **CRM** focuses on managing customer interactions and relationships, primarily for sales, marketing, and customer service,
