@@ -32,11 +32,12 @@ def load_data():
 
 df = load_data()
 
-# Sidebar filters with available dates
+# Sidebar filters with available calendar dates only
 st.sidebar.header("🔍 Filter Options")
 if not df.empty:
-    unique_dates = sorted(df['OrderDate'].dt.date.unique())
-    selected_date = st.sidebar.selectbox("Select Order Date", unique_dates)
+    available_dates = pd.to_datetime(df['OrderDate'].dt.date.unique())
+    min_date, max_date = available_dates.min(), available_dates.max()
+    selected_date = st.sidebar.date_input("Select Order Date", value=min_date, min_value=min_date, max_value=max_date)
     df = df[df['OrderDate'].dt.date == selected_date]
 else:
     selected_date = None
