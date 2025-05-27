@@ -32,7 +32,7 @@ def load_data():
     try:
         crm_df = pd.read_sql('SELECT * FROM "CRM_cust_info"', crm_engine)
         erp_df = pd.read_sql('SELECT * FROM "ERP_order_info"', erp_engine)
-        wh_df = pd.read_sql('SELECT * FROM dw_summary', warehouse_engine)
+        wh_df = pd.read_sql('SELECT * FROM "dw_summary"', warehouse_engine)
         return crm_df, erp_df, wh_df
     except Exception as e:
         st.error(f"❌ Error loading data: {e}")
