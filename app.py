@@ -15,9 +15,10 @@ warehouse_engine = create_engine(warehouse_url)
 # App title
 st.set_page_config(page_title="Cloud Data Dashboard", layout="wide")
 st.title("📊 Cloud Computing Data Dashboard")
+st.markdown("Explore CRM and ERP insights in one unified view.")
 
 # Sidebar filters
-st.sidebar.header("Filter Options")
+st.sidebar.header("🔍 Filter Options")
 date_filter = st.sidebar.date_input("Select Start Date")
 
 # Load cleaned data
@@ -33,22 +34,36 @@ def load_data():
 df = load_data()
 
 # CRM + ERP Section Combined
-st.subheader("🧾 CRM & ERP Combined Overview")
+st.subheader("📄 CRM & ERP Combined Overview")
 if not df.empty:
-    st.dataframe(df)
+    st.dataframe(df, use_container_width=True)
 
-    # Total Purchases Visualization
-    if 'cust_name' in df.columns and 'total_purchases' in df.columns:
-        fig1 = px.bar(df, x="cust_name", y="total_purchases",
-                      title="Total Purchases per Customer",
-                      labels={"cust_name": "Customer Name"})
+    st.markdown("---")
+    st.subheader("📊 Data Visualizations")
+
+    # Total Sales by Customer
+    if 'FirstName' in df.columns and 'SalesAmount' in df.columns:
+        sales_by_customer = df.groupby('FirstName')['SalesAmount'].sum().reset_index().sort_values(by='SalesAmount', ascending=False)
+        fig1 = px.bar(sales_by_customer, x='FirstName', y='SalesAmount',
+                      title="💰 Total Sales by Customer",
+                      labels={'FirstName': 'Customer Name', 'SalesAmount': 'Total Sales'})
         st.plotly_chart(fig1, use_container_width=True)
 
-    # Product Sales Visualization
-    if 'product_name' in df.columns and 'total_amount' in df.columns:
-        fig2 = px.pie(df, names='product_name', values='total_amount',
-                      title="Sales Distribution by Product")
+    # Top Selling Products
+    if 'ProductName' in df.columns and 'SalesAmount' in df.columns:
+        product_sales = df.groupby('ProductName')['SalesAmount'].sum().reset_index().sort_values(by='SalesAmount', ascending=False)
+        fig2 = px.pie(product_sales, values='SalesAmount', names='ProductName',
+                      title="🏆 Top Selling Products")
         st.plotly_chart(fig2, use_container_width=True)
+
+    # Quantity Trend Over Time
+    if 'OrderDate' in df.columns and 'Quantity' in df.columns:
+        df['OrderDate'] = pd.to_datetime(df['OrderDate'])
+        daily_quantity = df.groupby(df['OrderDate'].dt.to_period('M'))['Quantity'].sum().reset_index()
+        daily_quantity['OrderDate'] = daily_quantity['OrderDate'].dt.to_timestamp()
+        fig3 = px.line(daily_quantity, x='OrderDate', y='Quantity', markers=True,
+                       title="📈 Monthly Quantity Ordered")
+        st.plotly_chart(fig3, use_container_width=True)
 
 else:
     st.info("Cleaned data from crm_erp not available.")
