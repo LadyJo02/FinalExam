@@ -32,13 +32,20 @@ def load_data():
 
 df = load_data()
 
-# Sidebar filters with available calendar dates only
+# Sidebar filters with navigation
 st.sidebar.header("🔍 Filter Options")
 if not df.empty:
     available_dates = pd.to_datetime(df['OrderDate'].dt.date.unique())
     min_date, max_date = available_dates.min(), available_dates.max()
     selected_date = st.sidebar.date_input("Select Order Date", value=min_date, min_value=min_date, max_value=max_date)
     filtered_df = df[df['OrderDate'].dt.date == selected_date]
+
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("## 📌 Sections")
+    st.sidebar.markdown("- [📊 Key Business Insights](#key-business-insights)")
+    st.sidebar.markdown("- [💰 Total Sales by Customer](#total-sales-by-customer)")
+    st.sidebar.markdown("- [🏆 Top Selling Products](#top-selling-products)")
+    st.sidebar.markdown("- [📈 Monthly Quantity Ordered (All Time)](#monthly-quantity-ordered-all-time)")
 else:
     selected_date = None
     filtered_df = pd.DataFrame()
@@ -49,7 +56,7 @@ if not filtered_df.empty:
     st.dataframe(filtered_df, use_container_width=True)
 
     st.markdown("---")
-    st.subheader("📊 Key Business Insights")
+    st.subheader("📊 Key Business Insights", anchor="key-business-insights")
 
     col1, col2, col3 = st.columns(3)
 
@@ -69,6 +76,7 @@ if not filtered_df.empty:
 
     # Total Sales by Customer
     if 'FirstName' in filtered_df.columns and 'SalesAmount' in filtered_df.columns:
+        st.subheader("💰 Total Sales by Customer", anchor="total-sales-by-customer")
         sales_by_customer = filtered_df.groupby('FirstName')['SalesAmount'].sum().reset_index().sort_values(by='SalesAmount', ascending=False)
         fig1 = px.bar(sales_by_customer, x='FirstName', y='SalesAmount',
                       title="💰 Total Sales by Customer",
@@ -78,6 +86,7 @@ if not filtered_df.empty:
 
     # Top Selling Products
     if 'ProductName' in filtered_df.columns and 'SalesAmount' in filtered_df.columns:
+        st.subheader("🏆 Top Selling Products", anchor="top-selling-products")
         product_sales = filtered_df.groupby('ProductName')['SalesAmount'].sum().reset_index().sort_values(by='SalesAmount', ascending=False)
         fig2 = px.pie(product_sales, values='SalesAmount', names='ProductName',
                       title="🏆 Top Selling Products")
@@ -86,7 +95,7 @@ if not filtered_df.empty:
 # Always show full trend chart over time regardless of selected date
 if not df.empty and 'OrderDate' in df.columns and 'Quantity' in df.columns:
     st.markdown("---")
-    st.subheader("📈 Monthly Quantity Ordered (All Time)")
+    st.subheader("📈 Monthly Quantity Ordered (All Time)", anchor="monthly-quantity-ordered-all-time")
     monthly_quantity = df.groupby(df['OrderDate'].dt.to_period('M'))['Quantity'].sum().reset_index()
     monthly_quantity['OrderDate'] = monthly_quantity['OrderDate'].dt.to_timestamp()
     fig3 = px.line(monthly_quantity, x='OrderDate', y='Quantity', markers=True,
