@@ -31,7 +31,7 @@ date_filter = st.sidebar.date_input("Select Start Date")
 def load_data():
     try:
         crm_df = pd.read_sql('SELECT * FROM "CRM_cust_info"', crm_engine)
-        erp_df = pd.read_sql("SELECT * FROM erp_order_info", erp_engine)
+        erp_df = pd.read_sql("SELECT * FROM ERP_order_info", erp_engine)
         wh_df = pd.read_sql("SELECT * FROM dw_summary", warehouse_engine)
         return crm_df, erp_df, wh_df
     except Exception as e:
