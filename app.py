@@ -101,7 +101,7 @@ if not filtered_df.empty:
     if 'ProductName' in filtered_df.columns and 'SalesAmount' in filtered_df.columns:
         st.subheader("🏆 Top Selling Products", anchor="top-selling-products")
         product_sales = filtered_df.groupby('ProductName')['SalesAmount'].sum().reset_index().sort_values(by='SalesAmount', ascending=False)
-        fig2 = px.pie(product_sales, values='SalesAmount', names='ProductName',
+        fig2 = px.pie(product_sales, values='SalesAmount', names='ProductName',)
         st.plotly_chart(fig2, use_container_width=True)
 
 # Always show full trend chart over time regardless of selected date
