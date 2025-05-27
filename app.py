@@ -16,15 +16,13 @@ warehouse_engine = create_engine(warehouse_url)
 st.set_page_config(page_title="Cloud Data Dashboard", layout="wide")
 st.markdown("""
     <style>
-    section[data-testid="stSidebar"] {
-        background-color: #1e1f26;
-        color: white;
+    .sidebar-section a {
+        text-decoration: none !important;
+        font-weight: 500;
+        color: #3366cc;
     }
-    section[data-testid="stSidebar"] .css-1d391kg, .css-1v3fvcr, .css-10trblm {
-        color: white !important;
-    }
-    section[data-testid="stSidebar"] .css-1v3fvcr a {
-        color: #81cfff;
+    .sidebar-section a:hover {
+        color: #2a4d8f;
     }
     </style>
     <h1 style='text-align: center; color: #4CAF50;'>📊 Cloud Computing Data Dashboard</h1>
@@ -53,11 +51,15 @@ if not df.empty:
     filtered_df = df[df['OrderDate'].dt.date == selected_date]
 
     st.sidebar.markdown("---")
-    st.sidebar.markdown("## 📌 Sections")
-    st.sidebar.markdown("- [📊 Key Business Insights](#key-business-insights)")
-    st.sidebar.markdown("- [💰 Total Sales by Customer](#total-sales-by-customer)")
-    st.sidebar.markdown("- [🏆 Top Selling Products](#top-selling-products)")
-    st.sidebar.markdown("- [📈 Monthly Quantity Ordered (All Time)](#monthly-quantity-ordered-all-time)")
+    st.sidebar.markdown("## 📌 Sections", unsafe_allow_html=True)
+    st.sidebar.markdown("""
+    <div class='sidebar-section'>
+    • <a href="#key-business-insights">📊 Key Business Insights</a><br>
+    • <a href="#total-sales-by-customer">💰 Total Sales by Customer</a><br>
+    • <a href="#top-selling-products">🏆 Top Selling Products</a><br>
+    • <a href="#monthly-quantity-ordered-all-time">📈 Monthly Quantity Ordered (All Time)</a>
+    </div>
+    """, unsafe_allow_html=True)
 else:
     selected_date = None
     filtered_df = pd.DataFrame()
@@ -91,7 +93,6 @@ if not filtered_df.empty:
         st.subheader("💰 Total Sales by Customer", anchor="total-sales-by-customer")
         sales_by_customer = filtered_df.groupby('FirstName')['SalesAmount'].sum().reset_index().sort_values(by='SalesAmount', ascending=False)
         fig1 = px.bar(sales_by_customer, x='FirstName', y='SalesAmount',
-                      title="💰 Total Sales by Customer",
                       labels={'FirstName': 'Customer Name', 'SalesAmount': 'Total Sales'},
                       color='SalesAmount', color_continuous_scale='Viridis')
         st.plotly_chart(fig1, use_container_width=True)
@@ -100,8 +101,7 @@ if not filtered_df.empty:
     if 'ProductName' in filtered_df.columns and 'SalesAmount' in filtered_df.columns:
         st.subheader("🏆 Top Selling Products", anchor="top-selling-products")
         product_sales = filtered_df.groupby('ProductName')['SalesAmount'].sum().reset_index().sort_values(by='SalesAmount', ascending=False)
-        fig2 = px.pie(product_sales, values='SalesAmount', names='ProductName',
-                      title="🏆 Top Selling Products")
+        fig2 = px.pie(product_sales, values='SalesAmount', names='ProductName',)
         st.plotly_chart(fig2, use_container_width=True)
 
 # Always show full trend chart over time regardless of selected date
@@ -111,7 +111,6 @@ if not df.empty and 'OrderDate' in df.columns and 'Quantity' in df.columns:
     monthly_quantity = df.groupby(df['OrderDate'].dt.to_period('M'))['Quantity'].sum().reset_index()
     monthly_quantity['OrderDate'] = monthly_quantity['OrderDate'].dt.to_timestamp()
     fig3 = px.line(monthly_quantity, x='OrderDate', y='Quantity', markers=True,
-                   title="Monthly Quantity Ordered",
                    line_shape='spline', render_mode='svg')
     st.plotly_chart(fig3, use_container_width=True)
 
