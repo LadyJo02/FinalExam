@@ -38,14 +38,15 @@ if not df.empty:
     available_dates = pd.to_datetime(df['OrderDate'].dt.date.unique())
     min_date, max_date = available_dates.min(), available_dates.max()
     selected_date = st.sidebar.date_input("Select Order Date", value=min_date, min_value=min_date, max_value=max_date)
-    df = df[df['OrderDate'].dt.date == selected_date]
+    filtered_df = df[df['OrderDate'].dt.date == selected_date]
 else:
     selected_date = None
+    filtered_df = pd.DataFrame()
 
 # CRM + ERP Section Combined
 st.subheader("📄 CRM & ERP Combined Overview")
-if not df.empty:
-    st.dataframe(df, use_container_width=True)
+if not filtered_df.empty:
+    st.dataframe(filtered_df, use_container_width=True)
 
     st.markdown("---")
     st.subheader("📊 Key Business Insights")
@@ -53,22 +54,22 @@ if not df.empty:
     col1, col2, col3 = st.columns(3)
 
     with col1:
-        total_sales = df['SalesAmount'].sum()
+        total_sales = filtered_df['SalesAmount'].sum()
         st.metric(label="💵 Total Revenue", value=f"${total_sales:,.2f}")
 
     with col2:
-        total_products = df['ProductName'].nunique() if 'ProductName' in df.columns else 0
+        total_products = filtered_df['ProductName'].nunique() if 'ProductName' in filtered_df.columns else 0
         st.metric(label="📦 Total Products", value=total_products)
 
     with col3:
-        total_customers = df['CustomerID'].nunique()
+        total_customers = filtered_df['CustomerID'].nunique()
         st.metric(label="🧑 Total Customers", value=total_customers)
 
     st.markdown("---")
 
     # Total Sales by Customer
-    if 'FirstName' in df.columns and 'SalesAmount' in df.columns:
-        sales_by_customer = df.groupby('FirstName')['SalesAmount'].sum().reset_index().sort_values(by='SalesAmount', ascending=False)
+    if 'FirstName' in filtered_df.columns and 'SalesAmount' in filtered_df.columns:
+        sales_by_customer = filtered_df.groupby('FirstName')['SalesAmount'].sum().reset_index().sort_values(by='SalesAmount', ascending=False)
         fig1 = px.bar(sales_by_customer, x='FirstName', y='SalesAmount',
                       title="💰 Total Sales by Customer",
                       labels={'FirstName': 'Customer Name', 'SalesAmount': 'Total Sales'},
@@ -76,20 +77,22 @@ if not df.empty:
         st.plotly_chart(fig1, use_container_width=True)
 
     # Top Selling Products
-    if 'ProductName' in df.columns and 'SalesAmount' in df.columns:
-        product_sales = df.groupby('ProductName')['SalesAmount'].sum().reset_index().sort_values(by='SalesAmount', ascending=False)
+    if 'ProductName' in filtered_df.columns and 'SalesAmount' in filtered_df.columns:
+        product_sales = filtered_df.groupby('ProductName')['SalesAmount'].sum().reset_index().sort_values(by='SalesAmount', ascending=False)
         fig2 = px.pie(product_sales, values='SalesAmount', names='ProductName',
                       title="🏆 Top Selling Products")
         st.plotly_chart(fig2, use_container_width=True)
 
-    # Quantity Trend Over Time
-    if 'OrderDate' in df.columns and 'Quantity' in df.columns:
-        monthly_quantity = df.groupby(df['OrderDate'].dt.to_period('M'))['Quantity'].sum().reset_index()
-        monthly_quantity['OrderDate'] = monthly_quantity['OrderDate'].dt.to_timestamp()
-        fig3 = px.line(monthly_quantity, x='OrderDate', y='Quantity', markers=True,
-                       title="📈 Monthly Quantity Ordered",
-                       line_shape='spline', render_mode='svg')
-        st.plotly_chart(fig3, use_container_width=True)
+# Always show full trend chart over time regardless of selected date
+if not df.empty and 'OrderDate' in df.columns and 'Quantity' in df.columns:
+    st.markdown("---")
+    st.subheader("📈 Monthly Quantity Ordered (All Time)")
+    monthly_quantity = df.groupby(df['OrderDate'].dt.to_period('M'))['Quantity'].sum().reset_index()
+    monthly_quantity['OrderDate'] = monthly_quantity['OrderDate'].dt.to_timestamp()
+    fig3 = px.line(monthly_quantity, x='OrderDate', y='Quantity', markers=True,
+                   title="Monthly Quantity Ordered",
+                   line_shape='spline', render_mode='svg')
+    st.plotly_chart(fig3, use_container_width=True)
 
 else:
     st.info("No data available for the selected date.")
