@@ -15,6 +15,16 @@ warehouse_engine = create_engine(warehouse_url)
 # App title with improved layout
 st.set_page_config(page_title="Cloud Data Dashboard", layout="wide")
 st.markdown("""
+    <style>
+    .sidebar-section a {
+        text-decoration: none !important;
+        font-weight: 500;
+        color: #3366cc;
+    }
+    .sidebar-section a:hover {
+        color: #2a4d8f;
+    }
+    </style>
     <h1 style='text-align: center; color: #4CAF50;'>📊 Cloud Computing Data Dashboard</h1>
     <p style='text-align: center;'>Explore CRM and ERP insights in one unified view.</p>
 """, unsafe_allow_html=True)
@@ -41,11 +51,15 @@ if not df.empty:
     filtered_df = df[df['OrderDate'].dt.date == selected_date]
 
     st.sidebar.markdown("---")
-    st.sidebar.markdown("## 📌 Sections")
-    st.sidebar.markdown("- [📊 Key Business Insights](#key-business-insights)")
-    st.sidebar.markdown("- [💰 Total Sales by Customer](#total-sales-by-customer)")
-    st.sidebar.markdown("- [🏆 Top Selling Products](#top-selling-products)")
-    st.sidebar.markdown("- [📈 Monthly Quantity Ordered (All Time)](#monthly-quantity-ordered-all-time)")
+    st.sidebar.markdown("## 📌 Sections", unsafe_allow_html=True)
+    st.sidebar.markdown("""
+    <div class='sidebar-section'>
+    • <a href="#key-business-insights">📊 Key Business Insights</a><br>
+    • <a href="#total-sales-by-customer">💰 Total Sales by Customer</a><br>
+    • <a href="#top-selling-products">🏆 Top Selling Products</a><br>
+    • <a href="#monthly-quantity-ordered-all-time">📈 Monthly Quantity Ordered (All Time)</a>
+    </div>
+    """, unsafe_allow_html=True)
 else:
     selected_date = None
     filtered_df = pd.DataFrame()
